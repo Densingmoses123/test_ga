@@ -1,0 +1,8 @@
+{
+  "name": "simple-git-project",
+  "version": "1.0.0",
+  "scripts": {
+    "lint": "echo 'Linting...' && exit 0",
+    "test": "echo 'Running tests...' && exit 0"
+  }
+}
