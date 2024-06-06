@@ -7,16 +7,13 @@ on:
       - synchronize
 
 jobs:
-  build:
-    name: main
-    timeout-minutes: 15
+  lint:
+    name: Linting
     runs-on: ubuntu-22.04
 
     steps:
       - name: Check out code
         uses: actions/checkout@v4.1.1
-        with:
-          fetch-depth: 2
 
       - name: Setup Node.js environment
         uses: actions/setup-node@v4.0.2
@@ -26,14 +23,48 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Linting
+      - name: Run Linting
         run: npm run lint
 
-      - name: Unit and integration tests
+  tests:
+    name: Unit and integration tests
+    runs-on: ubuntu-22.04
+    needs: lint
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4.1.1
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v4.0.2
+        with:
+          node-version: '14'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run Tests
         run: npm test
 
+  sonar:
+    name: SonarCloud Scan
+    runs-on: ubuntu-22.04
+    needs: tests
+    continue-on-error: true
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4.1.1
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v4.0.2
+        with:
+          node-version: '14'
+
+      - name: Install dependencies
+        run: npm install
+
       - name: SonarCloud Scan
-        # continue-on-error: true
         uses: SonarSource/sonarcloud-github-action@master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
